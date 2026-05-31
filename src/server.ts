@@ -4,6 +4,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+import authRoutes from './routes/authRoutes.ts';
+
 const app = express();
 app.use(helmet());
 app.use(
@@ -18,6 +20,8 @@ app.use(
 		skip: () => isTestEnv(),
 	}),
 );
+
+app.use('/api/auth', authRoutes);
 
 app.get('/health', (req, res) => {
 	res.status(200).json({
