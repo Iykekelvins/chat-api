@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/auth.ts';
 import {
+	getUserByUsername,
 	getUserProfile,
 	updateUserPassword,
 	updateUserProfile,
 } from '../controllers/userController.ts';
-import { validateBody } from '../middleware/validation.ts';
+import { validateBody, validateParams } from '../middleware/validation.ts';
 import z from 'zod';
 
 const router = Router();
@@ -29,6 +30,10 @@ const updatePasswordSchema = z
 		path: ['confirmPassword'],
 	});
 
+const searchUserSchema = z.object({
+	username: z.string().min(1, { message: 'Username cannot be empty' }),
+});
+
 router.use(authenticateToken);
 
 router.get('/profile', getUserProfile);
@@ -38,5 +43,6 @@ router.put(
 	validateBody(updatePasswordSchema),
 	updateUserPassword,
 );
+router.get('/search/:username', validateParams(searchUserSchema), getUserByUsername);
 
 export default router;

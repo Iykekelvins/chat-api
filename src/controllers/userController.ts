@@ -111,3 +111,30 @@ export const updateUserPassword = async (
 		res.status(500).json({ error: 'Failed to update user password' });
 	}
 };
+
+export const getUserByUsername = async (
+	req: AuthenticatedRequest,
+	res: Response,
+) => {
+	try {
+		const { username } = req.params;
+
+		const user = await db.query.users.findFirst({
+			where: eq(users.username, username.toString()),
+		});
+
+		if (!user) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+
+		const { password, ...rest } = user;
+
+		res.json({
+			message: 'User fetched successfully',
+			data: rest,
+		});
+	} catch (error) {
+		console.error('Fetch user error', error);
+		res.status(500).json({ error: 'Failed to fetch user' });
+	}
+};
