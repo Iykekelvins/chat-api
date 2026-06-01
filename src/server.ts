@@ -6,6 +6,7 @@ import morgan from 'morgan';
 
 import authRoutes from './routes/authRoutes.ts';
 import chatRoutes from './routes/chatRoutes.ts';
+import messageRoutes from './routes/messageRoutes.ts';
 
 const app = express();
 app.use(helmet());
@@ -24,6 +25,7 @@ app.use(
 
 app.use('/api/auth', authRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/chats', messageRoutes);
 
 app.get('/health', (req, res) => {
 	res.status(200).json({
