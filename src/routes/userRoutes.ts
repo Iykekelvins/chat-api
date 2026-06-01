@@ -1,0 +1,42 @@
+import { Router } from 'express';
+import { authenticateToken } from '../middleware/auth.ts';
+import {
+	getUserProfile,
+	updateUserPassword,
+	updateUserProfile,
+} from '../controllers/userController.ts';
+import { validateBody } from '../middleware/validation.ts';
+import z from 'zod';
+
+const router = Router();
+
+const updateProfileSchema = z.object({
+	email: z.string().email().optional(),
+	username: z.string().optional(),
+	firstName: z.string().optional(),
+	lastName: z.string().optional(),
+	profilePicture: z.string().optional(),
+});
+
+const updatePasswordSchema = z
+	.object({
+		password: z.string().min(8, 'Password must be at least 8 characters'),
+		newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+		confirmPassword: z.string().min(8, 'Password must be at least 8 characters'),
+	})
+	.refine((data) => data.newPassword === data.confirmPassword, {
+		message: 'Passwords do not match',
+		path: ['confirmPassword'],
+	});
+
+router.use(authenticateToken);
+
+router.get('/profile', getUserProfile);
+router.put('/profile', validateBody(updateProfileSchema), updateUserProfile);
+router.put(
+	'/profile/password',
+	validateBody(updatePasswordSchema),
+	updateUserPassword,
+);
+
+export default router;
